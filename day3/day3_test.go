@@ -23,3 +23,28 @@ func TestStepsToPort(t *testing.T) {
 		}
 	}
 }
+
+func TestStressTest(t *testing.T) {
+	//Once a square is written, its value does not change. Therefore, the first few squares would receive the following values:
+	//
+	//147  142  133  122   59
+	//304    5    4    2   57
+	//330   10    1    1   54
+	//351   11   23   25   26
+	//362  747  806--->   ...
+	tests := []struct {
+		limit int
+		expected int
+	}{
+		{1, 2},
+		{12,23},
+		{55,57},
+		{800, 806},
+	}
+	for _, test := range tests {
+		result := StressTest(test.limit)
+		if result != test.expected {
+			t.Errorf("StressTest(%d) expected %d, got %d", test.limit, test.expected, result)
+		}
+	}
+}
