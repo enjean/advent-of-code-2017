@@ -10,6 +10,14 @@ import (
 )
 
 func Checksum(spreadsheet [][]int) int {
+	return doChecksum(spreadsheet, rowChecksum)
+}
+
+func Checksum2(spreadsheet [][]int) int {
+	return doChecksum(spreadsheet, rowChecksum2)
+}
+
+func doChecksum(spreadsheet [][]int, rowCheckF func([]int) int) int {
 	rowCh := make(chan []int)
 	rowChecksumCh := make(chan int)
 	go func() {
@@ -21,7 +29,7 @@ func Checksum(spreadsheet [][]int) int {
 
 	go func() {
 		for row := range rowCh {
-			rowChecksumCh <- rowChecksum(row)
+			rowChecksumCh <- rowCheckF(row)
 		}
 		close(rowChecksumCh)
 	}()
@@ -47,6 +55,20 @@ func rowChecksum(row []int) int {
 	return max - min
 }
 
+func rowChecksum2(row []int) int {
+	for i := 0; i < len(row); i++ {
+		for j:=0; j <len(row); j++ {
+			if i == j {
+				continue
+			}
+			if row[i] % row[j] == 0 {
+				return row[i] / row[j]
+			}
+		}
+	}
+	panic("no match found")
+}
+
 func main() {
 	file, err := os.Open("day2/input.txt")
 	if err != nil {
@@ -67,6 +89,6 @@ func main() {
 		spreadsheet = append(spreadsheet, row)
 	}
 
-	checksum := Checksum(spreadsheet)
-	fmt.Printf("Part 1 = %d\n", checksum)
+	fmt.Printf("Part 1 = %d\n", Checksum(spreadsheet))
+	fmt.Printf("Part 2 = %d\n", Checksum2(spreadsheet))
 }
