@@ -22,6 +22,8 @@ type Condition struct {
 	val      int
 }
 
+const MinInt = -int(^uint(0) >> 1) - 1
+
 func (c Condition) evaluate(registers map[string]int) bool {
 	registerVal := registers[c.register]
 	switch c.op {
@@ -41,8 +43,9 @@ func (c Condition) evaluate(registers map[string]int) bool {
 	panic(fmt.Errorf("unknown operation %s", c.op))
 }
 
-func Execute(instructions []Instruction) map[string]int {
+func Execute(instructions []Instruction) (map[string]int, int) {
 	registers := make(map[string]int)
+	largestSeen := MinInt
 
 	for _, instruction := range instructions {
 		if !instruction.condition.evaluate(registers) {
@@ -53,14 +56,16 @@ func Execute(instructions []Instruction) map[string]int {
 		} else {
 			registers[instruction.registerToModify] -= instruction.amount
 		}
-
+		if registers[instruction.registerToModify] > largestSeen {
+			largestSeen = registers[instruction.registerToModify]
+		}
 	}
 
-	return registers
+	return registers, largestSeen
 }
 
 func LargestValue(registers map[string]int) int {
-	max := -int(^uint(0) >> 1) - 1
+	max := MinInt
 	for _, rValue := range registers {
 		if rValue > max {
 			max = rValue
@@ -99,6 +104,7 @@ func main() {
 		instructions = append(instructions, instruction)
 	}
 
-	part1 := LargestValue(Execute(instructions))
-	fmt.Printf("Part 1: %d\n", part1)
+	registers, largestSeen := Execute(instructions)
+	fmt.Printf("Part 1: %d\n", LargestValue(registers))
+	fmt.Printf("Part 2: %d\n", largestSeen)
 }

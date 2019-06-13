@@ -14,9 +14,12 @@ func TestExecute(t *testing.T) {
 		{"c", true, -20, Condition{"c", "==", 10}},
 	}
 
-	result := Execute(instructions)
+	result, largestSeen := Execute(instructions)
 	largest := LargestValue(result)
 	if largest != 1 {
 		t.Errorf("Wrong largest value, expected 1, was %d registers were %v", largest, result)
+	}
+	if largestSeen != 10 {
+		t.Errorf("Wrong largest seen, expected 10, was %d", largestSeen)
 	}
 }
