@@ -7,8 +7,8 @@ import (
 	"os"
 )
 
-func Score(stream string) int {
-	score := 0
+func Score(stream string) (int, int) {
+	score, garbageCount := 0, 0
 	currentLevel := 0
 	ignoreNext, inGarbage := false, false
 	for _, runeVal := range stream {
@@ -22,6 +22,8 @@ func Score(stream string) int {
 				ignoreNext = true
 			case '>':
 				inGarbage = false
+			default:
+				garbageCount++
 			}
 		} else {
 			switch runeVal {
@@ -35,7 +37,7 @@ func Score(stream string) int {
 			}
 		}
 	}
-	return score
+	return score, garbageCount
 }
 
 func main() {
@@ -50,6 +52,7 @@ func main() {
 	scanner.Scan()
 	stream := scanner.Text()
 
-	score := Score(stream)
+	score, garbageCount := Score(stream)
 	fmt.Printf("Part 1: %d\n", score)
+	fmt.Printf("Part 2: %d\n", garbageCount)
 }
