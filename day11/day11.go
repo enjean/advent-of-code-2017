@@ -45,10 +45,24 @@ func StepsAway(path string) int {
 	return coord.dist(Coordinate{0,0})
 }
 
+func MaxStepsAway(path string) int {
+	steps := strings.Split(path, ",")
+	coord := Coordinate{0,0}
+	maxStepsAway := 0
+	for _, step := range steps {
+		coord.move(step)
+		stepsAway := coord.dist(Coordinate{0,0})
+		if stepsAway > maxStepsAway {
+			maxStepsAway = stepsAway
+		}
+	}
+	return maxStepsAway
+}
+
 func main() {
 	lines := adventutil.Parse(11)
 	path := lines[0]
 
-	stepsAway := StepsAway(path)
-	fmt.Printf("Day 11 Part 1: %d steps away", stepsAway)
+	fmt.Printf("Day 11 Part 1: %d steps away\n", StepsAway(path))
+	fmt.Printf("Day 11 Part 2: at most %d steps away\n", MaxStepsAway(path))
 }
