@@ -24,6 +24,33 @@ func ProgramsInGroup(group int, connections map[int][]int) int {
 	return len(visited)
 }
 
+func NumberOfGroups(connections map[int][]int) int {
+	numGroups := 0
+
+	visited := make(map[int]bool)
+
+	for groupId := range connections {
+		if visited[groupId] {
+			continue
+		}
+		numGroups++
+		visited[groupId] = true
+		toVisit := []int{groupId}
+		for len(toVisit) > 0 {
+			program := toVisit[0]
+			toVisit = toVisit[1:]
+			visited[program] = true
+			for _, neighbor := range connections[program] {
+				if visited[neighbor] {
+					continue
+				}
+				toVisit = append(toVisit, neighbor)
+			}
+		}
+	}
+	return numGroups
+}
+
 func main() {
 	lines := adventutil.Parse(12)
 	input := make(map[int][]int)
@@ -41,4 +68,8 @@ func main() {
 
 	groupSize := ProgramsInGroup(0, input)
 	fmt.Printf("Part 1: %d in group\n", groupSize)
+
+	numberOfGroups := NumberOfGroups(input)
+	fmt.Printf("Part 2: %d groups\n", numberOfGroups)
+
 }
