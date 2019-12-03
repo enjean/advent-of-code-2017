@@ -12,48 +12,41 @@ type Layer struct {
 	scannerRange int
 }
 
-type scannerPosition struct {
-	position    int
-	maxRange    int
-	isGoingDown bool
+func TripSeverity(firewall []Layer) int {
+
+	severity := 0
+	for _, l := range firewall {
+		frequency := (l.scannerRange - 1) * 2
+		if l.depth%frequency == 0 {
+			severity += l.depth * l.scannerRange
+		}
+	}
+
+	return severity
 }
 
-func TripSeverity(firewall []Layer) int {
-	severity := 0
-	maxDepth := firewall[len(firewall)-1].depth
-
-	scanners := make(map[int]*scannerPosition)
+func FindMinDelayForCleanTrip(firewall []Layer) int {
+	frequencies := make(map[int]int)
 	for _, l := range firewall {
-		scanners[l.depth] = &scannerPosition{
-			position:    0,
-			maxRange:    l.scannerRange,
-			isGoingDown: true,
-		}
+		frequencies[l.depth] = (l.scannerRange - 1) * 2
 	}
+	delay := 0
+	for {
+		if isRunClean(frequencies, delay) {
+			return delay
+		}
+		delay++
+	}
+}
 
-	for depth := 0; depth <= maxDepth; depth++ {
-		scannerAtDepth, ok := scanners[depth]
-		if ok && scannerAtDepth.position == 0 {
-			//fmt.Printf("Intersected at depth %d\n", depth)
-			severity += depth * scanners[depth].maxRange
-		}
-		//fmt.Printf("Second %d\n", depth)
-		for _, sc := range scanners {
-			//fmt.Printf("  %d Before: %d %v\n", d, sc.position, sc.isGoingDown)
-			if sc.position == 0 {
-				sc.isGoingDown = true
-			} else if sc.position == sc.maxRange-1 {
-				sc.isGoingDown = false
-			}
-			if sc.isGoingDown {
-				sc.position++
-			} else {
-				sc.position--
-			}
-			//fmt.Printf("  %d After: %d %v\n", d, sc.position, sc.isGoingDown)
+func isRunClean(frequencies map[int]int, delay int) bool {
+	for depth, frequency := range frequencies {
+		secondHittingDepth := depth + delay
+		if secondHittingDepth%frequency == 0 {
+			return false
 		}
 	}
-	return severity
+	return true
 }
 
 func main() {
@@ -69,5 +62,8 @@ func main() {
 		})
 	}
 
-	fmt.Printf("Part 1: severity %d\n", TripSeverity(firewall))
+	severity := TripSeverity(firewall)
+	fmt.Printf("Part 1: severity %d\n", severity)
+
+	fmt.Printf("Part 2: delay %d\n", FindMinDelayForCleanTrip(firewall))
 }
