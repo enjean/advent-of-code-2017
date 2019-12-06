@@ -8,3 +8,10 @@ func TestUsedSquares(t *testing.T) {
 		t.Errorf("Incorrect, expected %d, got %d", 8108, result)
 	}
 }
+
+func TestCountRegions(t *testing.T) {
+	result := CountRegions("flqrgnkx")
+	if result != 1242 {
+		t.Errorf("Incorrect, expected %d, got %d", 1242, result)
+	}
+}
